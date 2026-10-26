@@ -1,7 +1,7 @@
 {
   "name": "retro-pdf417",
   "description": "PDF417 barcode writer that mimics NADRA's CNIC barcode encoder",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

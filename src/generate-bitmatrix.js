@@ -26,8 +26,11 @@
  * "scale" columns wide and every symbol row is repeated
  * round(4 * scale * verticalStretch) times (at least once), because rows must
  * be taller than a module to scan reliably. With the defaults the matrix is
- * (69 + 17 * columnCount) wide and 4 * rowCount tall. No quiet zone is added,
- * so the caller can pad the matrix however its output needs.
+ * (69 + 17 * columnCount) wide and 4 * rowCount tall, plus the quiet zone.
+ *
+ * The quiet zone is "margin" modules (default 4) of light modules on every
+ * side, scaled by "scale" like the symbol itself, so the returned matrix is
+ * ready to render as is.
  */
 import { CODEWORD_PATTERNS } from "./codeword-patterns.js"
 
@@ -107,7 +110,7 @@ function scaleRow(rowModules, scale) {
 }
 
 function generateBitMatrix(codewords, columnCount, options) {
-  const { scale = 1, verticalStretch = 0.5 } = options
+  const { scale = 1, margin = 4, verticalStretch = 0.5 } = options
   const ecLevel = 4
 
   validateSymbolParameters(codewords, columnCount, ecLevel)
@@ -120,7 +123,14 @@ function generateBitMatrix(codewords, columnCount, options) {
 
   const rowCount = codewords.length / columnCount
   const rowRepeat = Math.max(1, Math.round(scale * 4 * verticalStretch))
+  const marginSize = margin * scale
+  const symbolWidth = (69 + 17 * columnCount) * scale
+  const paddedWidth = symbolWidth + marginSize * 2
   const bitMatrix = []
+
+  for (let rowIndex = 0; rowIndex < marginSize; rowIndex++) {
+    bitMatrix.push(new Uint8Array(paddedWidth))
+  }
 
   for (let rowIndex = 0; rowIndex < rowCount; rowIndex++) {
     const patterns = CODEWORD_PATTERNS[rowIndex % CLUSTER_COUNT]
@@ -142,10 +152,17 @@ function generateBitMatrix(codewords, columnCount, options) {
     appendPattern(rowModules, STOP_PATTERN, STOP_PATTERN_LENGTH)
 
     const scaledRow = scaleRow(Uint8Array.from(rowModules), scale)
+    const paddedRow = new Uint8Array(paddedWidth)
+    paddedRow.set(scaledRow, marginSize)
     for (let repeat = 0; repeat < rowRepeat; repeat++) {
-      bitMatrix.push(scaledRow.slice())
+      bitMatrix.push(paddedRow.slice())
     }
   }
+
+  for (let rowIndex = 0; rowIndex < marginSize; rowIndex++) {
+    bitMatrix.push(new Uint8Array(paddedWidth))
+  }
+
   return bitMatrix
 }
 

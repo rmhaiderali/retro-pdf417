@@ -2,7 +2,7 @@
 
 A PDF417 barcode **writer** (encoder only) that mimics the behaviour of the original writer used by NADRA for the barcode on Pakistani CNICs.
 
-It takes a 400-byte record and produces a PNG barcode that matches what the original writer would produce.
+It produces a PNG barcode that matches what the original writer would produce.
 
 > **Writer only.** This package cannot read or decode barcodes.
 >
@@ -20,7 +20,7 @@ npm install retro-pdf417
 import { writeFileSync } from "node:fs"
 import { generateBarcode } from "retro-pdf417"
 
-const bytes = new TextEncoder().encode("your record data here")
+const bytes = new TextEncoder().encode("your data here")
 
 const png = generateBarcode(bytes, { scale: 4 })
 writeFileSync("barcode.png", png)
@@ -30,10 +30,11 @@ writeFileSync("barcode.png", png)
 
 ### Options
 
-| Option            | Default | Description                                           |
-| ----------------- | ------- | ----------------------------------------------------- |
-| `scale`           | `1`     | Size of each barcode module in pixels (whole number). |
-| `verticalStretch` | `0.5`   | Makes the rows taller or shorter.                     |
+| Option            | Default | Description                            |
+| ----------------- | ------- | -------------------------------------- |
+| `scale`           | `1`     | Size of each barcode module in pixels. |
+| `margin`          | `4`     | Margin around the barcode in pixels.   |
+| `verticalStretch` | `0.5`   | Makes the rows taller or shorter.      |
 
 ## Other functions
 
@@ -42,7 +43,7 @@ If you want to draw the barcode yourself instead of getting a PNG, you can use t
 ```js
 import { generateCodeWords, generateBitMatrix } from "retro-pdf417"
 
-const { codewords, columnCount } = generateCodeWords(record)
+const { codewords, columnCount } = generateCodeWords(bytes)
 const matrix = generateBitMatrix(codewords, columnCount, { scale: 4 })
 // matrix is a list of rows where 1 is a dark module and 0 is light
 ```

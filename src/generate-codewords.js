@@ -81,7 +81,7 @@ const isTextEligibleByte = (byte) =>
 
 function lookupPunctuationValue(byte) {
   if (!PUNCTUATION_VALUE_BY_BYTE.has(byte)) {
-    throw new Error(`Byte ${byte} has no punctuation value`)
+    throw new Error("Byte " + byte + " has no punctuation value")
   }
   return PUNCTUATION_VALUE_BY_BYTE.get(byte)
 }

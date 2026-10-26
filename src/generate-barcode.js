@@ -4,7 +4,7 @@ import { generateBitMatrix } from "./generate-bitmatrix.js"
 import { generateCodeWords } from "./generate-codewords.js"
 
 function generateBarcode(bytes, options = {}) {
-  const { scale = 1, margin = 4, verticalStretch = 0.5 } = options
+  const { scale = 1, margin = 4, rowRepeat = 3 } = options
 
   const isBytesUint8Array = bytes instanceof Uint8Array
 
@@ -15,10 +15,10 @@ function generateBarcode(bytes, options = {}) {
   const { codewords, columnCount } = generateCodeWords(bytes)
 
   if (columnCount > 30) {
-    throw new Error("Too much bytes to encode")
+    throw new Error("Too many bytes to encode")
   }
 
-  const opts = { scale, margin, verticalStretch }
+  const opts = { scale, margin, rowRepeat }
   const bitMatrix = generateBitMatrix(codewords, columnCount, opts)
 
   const width = bitMatrix[0].length

@@ -24,9 +24,9 @@
  *
  * Scaling follows the usual PDF417 writer convention: every module becomes
  * "scale" columns wide and every symbol row is repeated
- * round(4 * scale * verticalStretch) times (at least once), because rows must
- * be taller than a module to scan reliably. With the defaults the matrix is
- * (69 + 17 * columnCount) wide and 4 * rowCount tall, plus the quiet zone.
+ * rowRepeat * scale times, because rows must be taller than a module to scan
+ * reliably. With the defaults (scale 1, rowRepeat 3) the symbol is
+ * (69 + 17 * columnCount) wide and 3 * rowCount tall, plus the quiet zone.
  *
  * The quiet zone is "margin" modules (default 4) of light modules on every
  * side, scaled by "scale" like the symbol itself, so the returned matrix is
@@ -109,26 +109,34 @@ function scaleRow(rowModules, scale) {
   return scaledRow
 }
 
-function generateBitMatrix(codewords, columnCount, options) {
-  const { scale = 1, margin = 4, verticalStretch = 0.5 } = options
+function generateBitMatrix(codewords, columnCount, options = {}) {
+  const { scale = 1, margin = 4, rowRepeat = 3 } = options
   const ecLevel = 4
 
   validateSymbolParameters(codewords, columnCount, ecLevel)
 
-  if (!Number.isInteger(scale) || scale < 1 || !(verticalStretch > 0)) {
-    throw new Error(
-      "Scale must be a positive integer and vertical stretch positive",
-    )
+  if (!Number.isInteger(scale) || scale < 1) {
+    throw new Error("options.scale must be a non-zero positive integer")
+  }
+
+  if (!Number.isInteger(margin) || margin < 0) {
+    throw new Error("options.margin must be a non-negative integer")
+  }
+
+  if (!Number.isInteger(rowRepeat) || rowRepeat < 1) {
+    throw new Error("options.rowRepeat must be a non-zero positive integer")
   }
 
   const rowCount = codewords.length / columnCount
-  const rowRepeat = Math.max(1, Math.round(scale * 4 * verticalStretch))
-  const marginSize = margin * scale
+
+  const scaledRowRepeat = rowRepeat * scale
+  const scaledMargin = margin * scale
+
   const symbolWidth = (69 + 17 * columnCount) * scale
-  const paddedWidth = symbolWidth + marginSize * 2
+  const paddedWidth = symbolWidth + scaledMargin * 2
   const bitMatrix = []
 
-  for (let rowIndex = 0; rowIndex < marginSize; rowIndex++) {
+  for (let rowIndex = 0; rowIndex < scaledMargin; rowIndex++) {
     bitMatrix.push(new Uint8Array(paddedWidth))
   }
 
@@ -153,13 +161,13 @@ function generateBitMatrix(codewords, columnCount, options) {
 
     const scaledRow = scaleRow(Uint8Array.from(rowModules), scale)
     const paddedRow = new Uint8Array(paddedWidth)
-    paddedRow.set(scaledRow, marginSize)
-    for (let repeat = 0; repeat < rowRepeat; repeat++) {
+    paddedRow.set(scaledRow, scaledMargin)
+    for (let repeat = 0; repeat < scaledRowRepeat; repeat++) {
       bitMatrix.push(paddedRow.slice())
     }
   }
 
-  for (let rowIndex = 0; rowIndex < marginSize; rowIndex++) {
+  for (let rowIndex = 0; rowIndex < scaledMargin; rowIndex++) {
     bitMatrix.push(new Uint8Array(paddedWidth))
   }
 

@@ -30,11 +30,11 @@ writeFileSync("barcode.png", png)
 
 ### Options
 
-| Option            | Default | Description                            |
-| ----------------- | ------- | -------------------------------------- |
-| `scale`           | `1`     | Size of each barcode module in pixels. |
-| `margin`          | `4`     | Margin around the barcode in pixels.   |
-| `verticalStretch` | `0.5`   | Makes the rows taller or shorter.      |
+| Option      | Default | Description                                 |
+| ----------- | ------- | ------------------------------------------- |
+| `scale`     | `1`     | Size of each barcode module in pixels.      |
+| `margin`    | `4`     | Margin around the barcode in pixels.        |
+| `rowRepeat` | `3`     | Repeats each row a certain number of times. |
 
 ## Other functions
 
@@ -50,5 +50,5 @@ const matrix = generateBitMatrix(codewords, columnCount, { scale: 4 })
 
 ## Limitations
 
-- Hardcoded max row count 20.
 - Always uses error correction level 4.
+- Targets 20 rows, with at most 30 columns (larger inputs throw error).

@@ -1,0 +1,47 @@
+{
+  "name": "retro-pdf417",
+  "description": "PDF417 barcode writer that mimics NADRA's CNIC barcode encoder",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rmhaiderali/retro-pdf417.git"
+  },
+  "homepage": "https://github.com/rmhaiderali/retro-pdf417",
+  "keywords": [
+    "pdf417",
+    "barcode",
+    "nadra",
+    "cnic",
+    "pakistan",
+    "encoder",
+    "writer"
+  ],
+  "scripts": {
+    "prepack": "npm run build",
+    "build": "tsdown && prettier dist --write --ignore-path /dev/null"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "pako": "^3.0.2",
+    "png-tools": "^1.1.1"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.10",
+    "tsdown": "^0.23.2"
+  },
+  "prettier": {
+    "semi": false
+  }
+}
